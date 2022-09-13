@@ -29,6 +29,7 @@ public class PokedexService implements IPokedexService {
     private final IPhotoRepository photoRepository;
     private final PokemonMapper pokemonMapper;
 
+
     @Override
     public void savePokemon(PokemonDto pokemonDto) {
         if (pokemonRepository.findByNumber(pokemonDto.getNumber()).isPresent()) {
@@ -37,20 +38,11 @@ public class PokedexService implements IPokedexService {
         Type type = typeRepository.save(pokemonMapper.toType(pokemonDto));
         Photo photo = photoRepository.save(pokemonMapper.toPhoto(pokemonDto));
         Pokemon pokemon = pokemonMapper.toPokemon(pokemonDto);
+
         pokemon.setTypeId(type.getId());
         pokemon.setPhotoId(photo.getId());
-        pokemonRepository.save(pokemon);
-    }
 
-    @Override
-    public List<PokemonDto> getAllPokemon() {
-        List<Pokemon> pokemons = pokemonRepository.findAll();
-        List<Type> types = typeRepository.findAll();
-        List<Photo> photos = photoRepository.findAll();
-        if (pokemons.isEmpty() || types.isEmpty() || photos.isEmpty()) {
-            throw new NoDataFoundException();
-        }
-        return pokemonMapper.toListDto(pokemons, types, photos);
+        pokemonRepository.save(pokemon);
     }
 
     @Override
@@ -62,24 +54,43 @@ public class PokedexService implements IPokedexService {
     }
 
     @Override
+    public List<PokemonDto> getAllPokemon() {
+        List<Pokemon> pokemons = pokemonRepository.findAll();
+        List<Type> types = typeRepository.findAll();
+        List<Photo> photos = photoRepository.findAll();
+
+        if (pokemons.isEmpty() || types.isEmpty() || photos.isEmpty()) {
+            throw new NoDataFoundException();
+        }
+        return pokemonMapper.toListDto(pokemons, types, photos);
+    }
+
+    @Override
     public void updatePokemon(PokemonDto pokemonDto) {
-        Pokemon oldPokemon = pokemonRepository.findByNumber(pokemonDto.getNumber()).orElseThrow(PokemonNotFoundException::new);
+        Pokemon oldPokemon = pokemonRepository.findByNumber(pokemonDto.getNumber())
+                .orElseThrow(PokemonNotFoundException::new);
+
         Type newType = pokemonMapper.toType(pokemonDto);
         newType.setId(oldPokemon.getTypeId());
         typeRepository.save(newType);
+
         Photo newPhoto = pokemonMapper.toPhoto(pokemonDto);
         newPhoto.setId(oldPokemon.getPhotoId());
         photoRepository.save(newPhoto);
+
         Pokemon newPokemon = pokemonMapper.toPokemon(pokemonDto);
         newPokemon.setId(oldPokemon.getId());
         newPokemon.setTypeId(oldPokemon.getTypeId());
         newPokemon.setPhotoId(oldPokemon.getPhotoId());
+
         pokemonRepository.save(newPokemon);
     }
 
     @Override
     public void deletePokemon(Long pokemonNumber) {
-        Pokemon pokemon = pokemonRepository.findByNumber(pokemonNumber).orElseThrow(PokemonNotFoundException::new);
+        Pokemon pokemon = pokemonRepository.findByNumber(pokemonNumber)
+                .orElseThrow(PokemonNotFoundException::new);
+
         typeRepository.deleteById(pokemon.getTypeId());
         photoRepository.deleteById(pokemon.getPhotoId());
         pokemonRepository.deleteByNumber(pokemonNumber);

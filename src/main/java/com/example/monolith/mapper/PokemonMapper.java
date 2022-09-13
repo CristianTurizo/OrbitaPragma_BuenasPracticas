@@ -42,14 +42,23 @@ public interface PokemonMapper {
     }
 
     default List<PokemonDto> toListDto(List<Pokemon> pokemonList, List<Type> types, List<Photo> photos) {
-        List<PokemonDto> pokemonDtoList = pokemonList.stream().map(pokemon -> {
-            PokemonDto pokeDto = new PokemonDto();
-            pokeDto.setNumber(pokemon.getNumber());
-            pokeDto.setName(pokemon.getName());
-            pokeDto.setTypes(types.stream().filter(pokeType -> pokeType.getId() == pokemon.getTypeId()).findFirst().orElseThrow(TypeNotFoundException::new));
-            pokeDto.setPhoto(byteArrayToBase64(photos.stream().filter(photo -> photo.getId().equals(pokemon.getPhotoId())).findFirst().orElseThrow(PhotoNotFoundException::new).getPhoto()));
-            return pokeDto;
-        }).toList();
-        return pokemonDtoList;
+        return pokemonList.stream()
+                .map(pokemon -> {
+                    PokemonDto pokeDto = new PokemonDto();
+                    pokeDto.setNumber(pokemon.getNumber());
+                    pokeDto.setName(pokemon.getName());
+                    pokeDto.setTypes(types.stream()
+                            .filter(pokeType -> pokeType.getId().equals(pokemon.getTypeId()))
+                            .findFirst()
+                            .orElseThrow(
+                                    TypeNotFoundException::new));
+                    pokeDto.setPhoto(byteArrayToBase64(photos.stream()
+                            .filter(photo -> photo.getId().equals(pokemon.getPhotoId()))
+                            .findFirst()
+                            .orElseThrow(
+                                    PhotoNotFoundException::new).getPhoto()));
+                    return pokeDto;
+                })
+                .toList();
     }
 }

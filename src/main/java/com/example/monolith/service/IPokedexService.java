@@ -8,11 +8,12 @@ public interface IPokedexService {
 
     void savePokemon(PokemonDto pokemonDto);
 
-    List<PokemonDto> getAllPokemon();
-
     PokemonDto getPokemon(Long pokemonNumber);
+
+    List<PokemonDto> getAllPokemon();
 
     void updatePokemon (PokemonDto pokemonDto);
 
     void deletePokemon (Long pokemonNumber);
+
 }

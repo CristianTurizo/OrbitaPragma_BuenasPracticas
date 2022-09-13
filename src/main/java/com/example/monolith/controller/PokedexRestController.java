@@ -30,16 +30,15 @@ public class PokedexRestController {
 
     private final IPokedexService pokedexService;
 
-    @Operation(summary = "Get all the pokemons")
+    @Operation(summary = "Add a new pokemon")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "All pokemons returned",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = PokemonDto.class)))),
-            @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
+            @ApiResponse(responseCode = "201", description = "Pokemon created", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Pokemon already exists", content = @Content)
     })
-    @GetMapping("/")
-    public ResponseEntity<List<PokemonDto>> getAllPokemon() {
-        return ResponseEntity.ok(pokedexService.getAllPokemon());
+    @PostMapping("/")
+    public ResponseEntity<Void> savePokemon(@RequestBody PokemonDto pokemonDto) {
+        pokedexService.savePokemon(pokemonDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "Get a pokemon by their Number")
@@ -53,15 +52,16 @@ public class PokedexRestController {
         return ResponseEntity.ok(pokedexService.getPokemon(pokemonNumber));
     }
 
-    @Operation(summary = "Add a new pokemon")
+    @Operation(summary = "Get all the pokemons")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Pokemon created", content = @Content),
-            @ApiResponse(responseCode = "409", description = "Pokemon already exists", content = @Content)
+            @ApiResponse(responseCode = "200", description = "All pokemons returned",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = PokemonDto.class)))),
+            @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
-    @PostMapping("/")
-    public ResponseEntity<Void> savePokemon(@RequestBody PokemonDto pokemonDto) {
-        pokedexService.savePokemon(pokemonDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @GetMapping("/")
+    public ResponseEntity<List<PokemonDto>> getAllPokemon() {
+        return ResponseEntity.ok(pokedexService.getAllPokemon());
     }
 
     @Operation(summary = "Update an existing pokemon")
@@ -81,8 +81,10 @@ public class PokedexRestController {
             @ApiResponse(responseCode = "404", description = "Pokemon not found", content = @Content)
     })
     @DeleteMapping("/{number}")
-    public ResponseEntity deletePokemonByNumber(@Parameter(description = "Number of the pokemon to be deleted")
-                                                    @PathVariable(name = "number") Long pokemonNumber) {
+    public ResponseEntity<Void> deletePokemonByNumber(
+            @Parameter(description = "Number of the pokemon to be deleted")
+            @PathVariable(name = "number") Long pokemonNumber
+    ) {
         pokedexService.deletePokemon(pokemonNumber);
         return ResponseEntity.noContent().build();
     }
