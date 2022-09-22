@@ -8,7 +8,7 @@ public interface IPokedexService {
 
     void savePokemon(PokemonDto pokemonDto);
 
-    PokemonDto getPokemon(Long pokemonNumber);
+    PokemonDto getPokemonByNumber(Long pokemonNumber);
 
     List<PokemonDto> getAllPokemon();
 

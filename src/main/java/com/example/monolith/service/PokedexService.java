@@ -46,10 +46,11 @@ public class PokedexService implements IPokedexService {
     }
 
     @Override
-    public PokemonDto getPokemon(Long pokemonNumber) {
+    public PokemonDto getPokemonByNumber(Long pokemonNumber) {
         Pokemon pokemon = pokemonRepository.findByNumber(pokemonNumber).orElseThrow(PokemonNotFoundException::new);
         Type type = typeRepository.findById(pokemon.getTypeId()).orElseThrow(TypeNotFoundException::new);
         Photo photo = photoRepository.findById(pokemon.getPhotoId()).orElseThrow(PhotoNotFoundException::new);
+
         return pokemonMapper.toDto(pokemon, type, photo);
     }
 
@@ -95,4 +96,5 @@ public class PokedexService implements IPokedexService {
         photoRepository.deleteById(pokemon.getPhotoId());
         pokemonRepository.deleteByNumber(pokemonNumber);
     }
+
 }

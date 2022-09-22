@@ -49,7 +49,7 @@ public class PokedexRestController {
     })
     @GetMapping("/{number}")
     public ResponseEntity<PokemonDto> getPokemonByNumber(@PathVariable(name = "number") Long pokemonNumber) {
-        return ResponseEntity.ok(pokedexService.getPokemon(pokemonNumber));
+        return ResponseEntity.ok(pokedexService.getPokemonByNumber(pokemonNumber));
     }
 
     @Operation(summary = "Get all the pokemons")
